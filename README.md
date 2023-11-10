@@ -12,7 +12,7 @@ Must of the following installed
 #### Windows
 
 Run the following in your anaconda prompt at your project's root
-`flask --app flaskr run --debugger` <br>
+`flask --app flaskr --debug run` <br>
 You should now see
 ```
  * Serving Flask app 'flaskr'
