@@ -34,7 +34,7 @@ def get_assignments(auth_token, courseId):
 
      try:
 
-         assignments = {}  # store assignments with key: id and value: student
+         assignments = {}  # store assignments with key: id and value: assignment objects
 
 
 
@@ -43,6 +43,20 @@ def get_assignments(auth_token, courseId):
          print('issue reading assignments')
          return
 
+
+def get_parts(auth_toke, courseId, assignmentId):
+
+    url = f"https://api.vocareum.com/api/v2/courses/{courseId}/assignments/{assignmentId}/parts"
+
+    headers = {'Authorization':f"Token {auth_toke}"}
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        print(f'Unable to get students: {response.status_code}')
+        return
+
+    response_dict = json.loads(response.json())
 
 '''
 
