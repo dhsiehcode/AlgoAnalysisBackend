@@ -30,7 +30,7 @@ def get_assignments(auth_token, courseId):
          print(f'Unable to get assignments: {response.status_code}')
          return
 
-     response_dict = json.loads(response.json())
+     response_dict = json.loads(response.text)
 
      try:
 
@@ -56,7 +56,18 @@ def get_parts(auth_toke, courseId, assignmentId):
         print(f'Unable to get students: {response.status_code}')
         return
 
-    response_dict = json.loads(response.json())
+    response_dict = json.loads(response.text)
+
+    try:
+
+        assignments = {}  # store assignments with key: id and value: assignment objects
+
+
+
+
+    except KeyError:
+        print('issue reading parts')
+        return
 
 '''
 
@@ -80,7 +91,7 @@ def get_students(auth_token, courseId):
         print(f'Unable to get students: {response.status_code}')
         return
 
-    response_dict = json.loads(response.json())
+    response_dict = json.loads(response.text)
 
     try:
 
@@ -90,8 +101,10 @@ def get_students(auth_token, courseId):
             students[student['id']] = student['name']
 
     except KeyError:
-        print('issue reading courses')
+        print('issue reading students')
         return
+
+    return students
 
 
 '''
@@ -100,6 +113,8 @@ auth_token: authentication token generated
 
 '''
 def get_courses(auth_token):
+
+    print("getting courses")
 
     url = "https://api.vocareum.com/api/v2/courses"
 
@@ -111,7 +126,7 @@ def get_courses(auth_token):
         print(f'Unable to get courses: {response.status_code}')
         return
 
-    response_dict = json.loads(response.json())
+    response_dict = json.loads(response.text)
 
     try:
 
@@ -123,4 +138,6 @@ def get_courses(auth_token):
     except KeyError:
         print('issue reading courses')
         return
+
+    return courses
 
