@@ -1,9 +1,18 @@
 DROP TABLE IF EXISTS user;
 
-CREATE TABLE user (
-    username TEXT UNIQUE NOT NULL
+CREATE TABLE users (
+    id TEXT UNIQUE PRIMARY KEY,
+    name TEXT NOT NULL,
+    course TEXT NOT NULL
 );
 
-CREATE TABLE runtime_profile (
-
+CREATE TABLE courses (
+    id TEXT UNIQUE PRIMARY KEY,
+    name TEXT NOT NULL
 );
+
+CREATE TABLE assignments (
+
+    course
+
+)
