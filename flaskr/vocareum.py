@@ -66,20 +66,28 @@ def get_parts(auth_token, courseId, assignmentId):
 
     response_dict = json.loads(response.text)
 
+    parts = {}
+
     try:
 
-        assignments = {}  # store assignments with key: id and value: assignment objects
+          # store assignments with key: id and value: part name
 
+        for part in response_dict['parts']:
 
-
+            parts[part['id']] = part['name']
 
     except KeyError:
         print('issue reading parts')
         return
 
+    return parts
 
 
 '''
+
+extracts submission of student to {save_location}/{zipfile_name}
+
+returns the location where the code is and the inner directory specified by "dirname":"{string}
 
 
 '''
@@ -91,8 +99,13 @@ def get_latest_submission(auth_token, courseId, assignmentId, partId, userId, sa
 
     response = requests.get(url, headers=headers)
 
+    if response.status_code == 404:
+    ## case where student doesn't have submission
+        print("no assignments")
+        return None, None
+
     if response.status_code != 200:
-        print(f'Unable to get students: {response.status_code}')
+        print(f'Unable to get assignen: {response.status_code}')
         return
 
     response_dict = json.loads(response.text)
@@ -102,10 +115,11 @@ def get_latest_submission(auth_token, courseId, assignmentId, partId, userId, sa
         return
 
 
+
     '''
     dict of format:
      {"userid":"{number}","partid":"{number}","last_submission_at":"{Month} {day} {year} {hour}:{minute}:{seconds}pm/am
-        PST","submission_count":"{number}","dirname":"{string}}","zipfilecontent":"{string}"}
+        PST","submission_count":"{number}","dirname":"{string}","zipfilecontent":"{string}"}
     '''
     submission_info = response_dict['submissions'][0]
 
@@ -113,7 +127,7 @@ def get_latest_submission(auth_token, courseId, assignmentId, partId, userId, sa
     content = content.replace("\\", "")
     content_64 = base64.b64decode(content)
 
-    zipfile_name = f"{userId} submission"
+    zipfile_name = f"{userId}_submission"
 
     with open(f"{save_location}/{zipfile_name}.zip", "wb") as f:
         f.write(content_64)
@@ -121,7 +135,8 @@ def get_latest_submission(auth_token, courseId, assignmentId, partId, userId, sa
     z = zipfile.ZipFile(f"{save_location}/{zipfile_name}.zip", "r")
     z.extractall(path=f"{save_location}")
 
-    return submission_info['dirname']
+
+    return f"{save_location}", submission_info['dirname']
 
 
 
