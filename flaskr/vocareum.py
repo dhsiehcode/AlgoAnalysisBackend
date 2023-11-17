@@ -1,5 +1,9 @@
+import base64
+import io
+
 import requests
 import json
+import zipfile
 
 '''
 
@@ -43,12 +47,16 @@ def get_assignments(auth_token, courseId):
          print('issue reading assignments')
          return
 
+'''
 
-def get_parts(auth_toke, courseId, assignmentId):
+gets all the parts that exists in a assignment
+
+'''
+def get_parts(auth_token, courseId, assignmentId):
 
     url = f"https://api.vocareum.com/api/v2/courses/{courseId}/assignments/{assignmentId}/parts"
 
-    headers = {'Authorization':f"Token {auth_toke}"}
+    headers = {'Authorization':f"Token {auth_token}"}
 
     response = requests.get(url, headers=headers)
 
@@ -68,6 +76,55 @@ def get_parts(auth_toke, courseId, assignmentId):
     except KeyError:
         print('issue reading parts')
         return
+
+
+
+'''
+
+
+'''
+def get_latest_submission(auth_token, courseId, assignmentId, partId, userId, save_location):
+
+    url = f"https://api.vocareum.com/api/v2/courses/{courseId}/assignments/{assignmentId}/parts/{partId}/submissions/{userId}"
+
+    headers = {"Authorization":f"Token {auth_token}"}
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        print(f'Unable to get students: {response.status_code}')
+        return
+
+    response_dict = json.loads(response.text)
+
+    if response_dict['status'] != "success":
+        print("failed to read submission")
+        return
+
+
+    '''
+    dict of format:
+     {"userid":"{number}","partid":"{number}","last_submission_at":"{Month} {day} {year} {hour}:{minute}:{seconds}pm/am
+        PST","submission_count":"{number}","dirname":"{string}}","zipfilecontent":"{string}"}
+    '''
+    submission_info = response_dict['submissions'][0]
+
+    content = submission_info['zipfilecontent']
+    content = content.replace("\\", "")
+    content_64 = base64.b64decode(content)
+
+    zipfile_name = f"{userId} submission"
+
+    with open(f"{save_location}/{zipfile_name}.zip", "wb") as f:
+        f.write(content_64)
+
+    z = zipfile.ZipFile(f"{save_location}/{zipfile_name}.zip", "r")
+    z.extractall(path=f"{save_location}")
+
+    return submission_info['dirname']
+
+
+
 
 '''
 
