@@ -32,7 +32,7 @@ def close_db(e=None):
         db.close()
 
 def init_db():
-    db = get_db()
+    db = get_db() # returns database connection
 
     with current_app.open_resource('schema.sql') as f:
         db.executescript(f.read().decode('utf8'))
@@ -47,4 +47,10 @@ def init_db_command():
 def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
+
+def get_db_connection():
+    db = get_db()
+    conn = sqlite3.connect(db)
+    conn.row_factory = sqlite3.row
+    return conn
 

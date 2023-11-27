@@ -1,28 +1,37 @@
-DROP TABLE IF EXISTS user;
 
-CREATE TABLE users (
-    id INTEGER UNIQUE PRIMARY KEY,
-    name TEXT NOT NULL,
-    FOREIGN KEY courseId REFERENCES courses(id)
-);
+DROP TABLE IF EXISTS courses;
 
 CREATE TABLE courses (
     id INTEGER UNIQUE PRIMARY KEY,
     name TEXT NOT NULL
 );
 
-CREATE TABLE assignments (
 
-    courseId INTEGER NOT NULL,
+DROP TABLE IF EXISTS users;
+
+
+CREATE TABLE users (
+    id INTEGER UNIQUE PRIMARY KEY,
     name TEXT NOT NULL,
-    id INTEGER PRIMARY KEY,
-    FOREIGN KEY courseId REFERENCES courses(id)
+    courseId INTEGER NOT NULL,
+    FOREIGN KEY (courseId) REFERENCES courses(id)
 );
 
+DROP TABLE IF EXISTS assignments;
+
+CREATE TABLE assignments (
+    id INTEGER PRIMARY KEY,
+    name TEXT NOT NULL,
+    courseId INTEGER NOT NULL,
+    FOREIGN KEY (courseId) REFERENCES courses(id)
+);
+
+DROP TABLE IF EXISTS parts;
 
 CREATE TABLE parts (
 
+    id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
-    id INTEGER PRIMARY KEY
-    FOREIGN KEY assignmentId REFERENCES assignments(id)
+    assignmentId INTEGER NOT NULL,
+    FOREIGN KEY (assignmentId) REFERENCES assignments(id)
 );
