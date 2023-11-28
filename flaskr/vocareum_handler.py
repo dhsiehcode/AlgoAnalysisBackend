@@ -2,7 +2,13 @@ import os
 import vocareum
 
 
+'''
 
+Author: Dennis Hsieh
+
+file the handle operations between vocareum and 
+
+'''
 
 ## Using Dennis' auth token for now
 auth_toke = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
@@ -19,6 +25,11 @@ def init_check():
     if not os.path.exists(f"{os.getcwd()}/../submissions"):
         os.mkdir(f"{os.getcwd()}/../submissions")
 
+'''
+
+gets all the submissions of all students for an assignment in a course 
+
+'''
 def get_all_submissions_by_assignment(courseId,assignmentId):
 
     ## before db is up we get all students
@@ -34,7 +45,7 @@ def get_all_submissions_by_assignment(courseId,assignmentId):
 
 '''
 
-gets all the submissions from all students for a particular part of an assignemnt of a course
+gets all the submissions from all students for a particular part of an assignment of a course
 
 '''
 def get_all_submissions_by_part(courseId, assignmentId, partId):

@@ -14,6 +14,10 @@ Also should store some basic information about students
 
 '''
 
+'''
+gets the database
+returns the database
+'''
 def get_db():
     if 'db' not in g:
         g.db = sqlite3.connect(
@@ -25,12 +29,18 @@ def get_db():
     return g.db
 
 
+'''
+closes connection
+'''
 def close_db(e=None):
     db = g.pop('db', None)
 
     if db is not None:
         db.close()
 
+'''
+creates the schema if it doesn't exist
+'''
 def init_db():
     db = get_db() # returns database connection
 
@@ -38,6 +48,9 @@ def init_db():
         db.executescript(f.read().decode('utf8'))
 
 
+'''
+initialize database
+'''
 @click.command('init-db')
 def init_db_command():
     """Clear the existing data and create new tables."""
@@ -48,6 +61,9 @@ def init_app(app):
     app.teardown_appcontext(close_db)
     app.cli.add_command(init_db_command)
 
+'''
+forms connection with the database
+'''
 def get_db_connection():
     db = get_db()
     conn = sqlite3.connect(db)

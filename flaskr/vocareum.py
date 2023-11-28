@@ -10,14 +10,9 @@ import zipfile
 author: Dennis Hsieh
 date: 11/13/2023
 
-
-
 '''
 
 '''
-
-author: Dennis Hsieh
-date: 11/13/2023
 
 gets all the assignments in a course given the id. returns 
 
@@ -46,6 +41,8 @@ def get_assignments(auth_token, courseId):
      except KeyError:
          print('issue reading assignments')
          return
+
+
 
 '''
 
