@@ -8,6 +8,24 @@ wrapper class for some vocareum objeccts
 
 '''
 
+
+'''
+represents a student 
+'''
+class Student:
+
+    def __init__(self, name, id):
+        self.name = name
+        self.id = id
+
+    def get_name(self):
+
+        return self.name
+
+    def get_id(self):
+
+        return self.id
+
 '''
 
 represents a part in an assignment takes the name and id for the part
