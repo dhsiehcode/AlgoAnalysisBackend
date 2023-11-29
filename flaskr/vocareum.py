@@ -6,6 +6,8 @@ import requests
 import json
 import zipfile
 
+import voc_objects
+
 '''
 
 author: Dennis Hsieh
@@ -15,7 +17,7 @@ date: 11/13/2023
 
 '''
 
-gets all the assignments in a course given the id. returns 
+gets all the assignments in a course given the id. returns a list of assignment objects
 
 '''
 def get_assignments(auth_token, courseId):
@@ -34,20 +36,59 @@ def get_assignments(auth_token, courseId):
 
      try:
 
-         assignments = {}  # store assignments with key: id and value: assignment objects
+        ## gets all the assignments
+        assignments = []
+        for assignment_dict in response_dict['assignments']:
+            assignment = voc_objects.Assignment(assignment_dict['name'], assignment_dict['id'])
 
-
-
+            parts = get_parts(auth_token, courseId, assignment.get_id())
+            assignment.set_parts(parts)
+            assignments.append(assignment)
 
      except KeyError:
          print('issue reading assignments')
          return
 
+     return assignments
+
+'''
+
+returns assignment object with name, id, and parts populated as a list of part objects
+
+'''
+def get_assignment(auth_token, courseId, assignmentId):
+    url = f"https://api.vocareum.com/api/v2/courses/{courseId}/assignments/{assignmentId}"
+
+    headers = {"Authorization": f"Token {auth_token}"}
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        print(f'Unable to get assignments: {response.status_code}')
+        return
+
+    response_dict = json.loads(response.text)
+
+    try:
+
+
+        assignment_dict =  response_dict['assignments']
+        assignment = voc_objects.Assignment(assignment_dict['name'], assignment_dict['id'])
+
+        parts = get_parts(auth_token, courseId, assignmentId)
+        assignment.set_parts(parts)
+
+
+    except KeyError:
+        print('issue reading assignments')
+        return
+
+    return assignment
 
 
 '''
 
-gets all the parts that exists in a assignment
+returns a list of part objects given course id and assignment id
 
 '''
 def get_parts(auth_token, courseId, assignmentId):
@@ -64,15 +105,16 @@ def get_parts(auth_token, courseId, assignmentId):
 
     response_dict = json.loads(response.text)
 
-    parts = {}
+    parts = []
 
     try:
 
-          # store assignments with key: id and value: part name
-
         for part in response_dict['parts']:
 
-            parts[part['id']] = part['name']
+            part_id = part['id']
+            part_name = part['name']
+
+            parts.append(voc_objects.Part(part_name, part_id))
 
     except KeyError:
         print('issue reading parts')
@@ -80,6 +122,32 @@ def get_parts(auth_token, courseId, assignmentId):
 
     return parts
 
+'''
+
+returns a Part object given the course id, assigment id, part id
+
+'''
+def get_part(auth_token, courseId, assignmentId, partId):
+
+
+
+    url = f"https://api.vocareum.com/api/v2/courses/{courseId}/assignments/{assignmentId}/parts/{partId}"
+
+    headers = {'Authorization':f"Token {auth_token}"}
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        print(f'Unable to get students: {response.status_code}')
+        return
+
+    response_dict = json.loads(response.text)
+
+    part = voc_objects.Part(name=response_dict['parts']['name'], id = response_dict['parts']['id'])
+
+    ## returns part object
+
+    return part
 
 '''
 
@@ -165,10 +233,12 @@ def get_students(auth_token, courseId):
 
     try:
 
-        students = {} # store courses with key: id and value: student
+        students = [] # store courses with id and name. students[n][0] = {name} students[n][1] = {id}
 
         for student in response_dict['users']:
-            students[student['id']] = student['name']
+
+            students.append(voc_objects.Student(student['name'], student['id']))
+
 
     except KeyError:
         print('issue reading students')
@@ -200,16 +270,49 @@ def get_courses(auth_token):
 
     try:
 
-        courses = {} # store courses with key: id and value: course name
+        courses = []
 
-        for course in response_dict['courses']:
-            courses[course['id']] = course['name']
+        for course_dict in response_dict['courses']:
+
+            course = voc_objects.Course(course_dict['name'], course_dict['id'])
+
+            course.set_assignments(course.get_id())
+
+            courses.append(course)
+
 
     except KeyError:
         print('issue reading courses')
         return
 
     return courses
+
+'''
+
+returns and object representing a course with assignments populated
+
+'''
+def get_course(auth_token, courseId):
+
+    url = f"https://api.vocareum.com/api/v2/courses/{courseId}"
+
+    headers = {"Authorization": f"Token {auth_token}"}
+
+    response = requests.get(url, headers=headers)
+
+    if response.status_code != 200:
+        print(f'Unable to get courses: {response.status_code}')
+        return
+
+    response_dict = json.loads(response.text)
+
+    course_dict = response_dict['courses']
+
+    course = voc_objects.Course(response_dict['name'], course_dict['id'])
+
+    course.set_assignments(get_assignments(auth_token, courseId))
+
+    return courseId
 
 ## Using Dennis' auth token for now
 auth_toke = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
