@@ -93,7 +93,7 @@ class Course:
         self.name = name
         self.assignments = []
 
-    def get_course(self):
+    def get_name(self):
         return self.name
 
     def get_id(self):
