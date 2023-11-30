@@ -27,20 +27,20 @@ def get_info():
     
     '''
 
-    users_output = "users: "
+    users_output = "users: \n"
 
     for user in users:
-        users_output += f" {user['name']} with id {user['id']} in course {user['courseId']}"
+        users_output += f" {user['name']} with id {user['id']} in course {user['courseId']}\n"
 
-    assignment_output = "assignments: "
+    assignment_output = "assignments: \n"
 
     for assignment in assignments:
-        assignment_output += f" {assignment['name']} with id {assignment['id']} in course {assignment['courseId']}"
+        assignment_output += f" {assignment['name']} with id {assignment['id']} in course {assignment['courseId']}\n"
 
-    part_output = "parts: "
+    part_output = "parts: \n"
 
     for part in parts:
-        part_output += f" {part['name']} with id {part['id']} in course {part['courseId']} in assignment {part['assignmentId']}"
+        part_output += f" {part['name']} with id {part['id']} in course {part['courseId']} in assignment {part['assignmentId']}\n"
 
     db.close_db()
 
@@ -77,45 +77,53 @@ def populate_info():
     ## populate courses
     for course in courses:
 
-        if conn.execute("SELECT EXISTS(SELECT * FROM courses WHERE id = ? AND name = ?)", (course.get_id(), course.get_name(),)):
-            continue
-        else:
+        # if conn.execute("SELECT EXISTS(SELECT * FROM courses WHERE id = ? AND name = ?)", (course.get_id(), course.get_name(),)):
+        #     continue
+        # else:
+        try:
             conn.execute("INSERT INTO courses (id, name) VALUES (?, ?)", (course.get_id(), course.get_name()))
-
+        except sqlite3.IntegrityError:
+            continue
     ### populate students and course hey are in
 
     for course in courses:
 
         for student in vocareum.get_students(auth_token, course.get_id()):
 
-            if conn.execute("SELECT EXISTS(SELECT * FROM users WHERE id = ? AND name = ? AND courseId = ?)",
-                            (student.get_id(), student.get_name(), course.get_id(),)):
-                continue
-            else:
+            # if conn.execute("SELECT EXISTS(SELECT * FROM users WHERE id = ? AND name = ? AND courseId = ?)",
+            #                  (student.get_id(), student.get_name(), course.get_id(),)) == 1:
+            #      continue
+            # else:
+            try:
                 conn.execute("INSERT INTO users (id, name, courseId) VALUES (?, ?, ?)", (student.get_id(), student.get_name(), course.get_id()))
-
+            except sqlite3.IntegrityError:
+                continue
     ### populate assignment
 
     for course in courses:
 
         for assignment in course.get_assignments():
 
-            if conn.execute("SELECT EXISTS(SELECT * FROM assignments WHERE id = ? AND name = ? AND courseId = ?)",
-                            (assignment.get_id(), assignment.get_name(), course.get_id())):
-                continue
-            else:
+            # if conn.execute("SELECT EXISTS(SELECT * FROM assignments WHERE id = ? AND name = ? AND courseId = ?)",
+            #                 (assignment.get_id(), assignment.get_name(), course.get_id())):
+            #     continue
+            # else:
+            try:
                 conn.execute("INSERT INTO assignments (id, name, courseId) VALUES (?, ?, ?)", (assignment.get_id(), assignment.get_name(), course.get_id()))
-
+            except sqlite3.IntegrityError:
+                continue
             ## populate part
 
             for part in assignment.get_parts():
 
-                if conn.execute("SELECT EXISTS(SELECT * FROM parts WHERE id = ? AND name = ? AND assignmentId = ? AND courseId = ?)",
-                                (part.get_id(), part.get_name(), assignment.get_id, course.get_id())):
-                    continue
-                else:
+                # if conn.execute("SELECT EXISTS(SELECT * FROM parts WHERE id = ? AND name = ? AND assignmentId = ? AND courseId = ?)",
+                #                 (part.get_id(), part.get_name(), assignment.get_id, course.get_id())):
+                #     continue
+                # else:
+                try:
                     conn.execute("INSERT INTO parts (id, name, assignmentId, courseId) VALUES (?, ?, ?, ?)", (part.get_id(), part.get_name(), assignment.get_id(), course.get_id()))
-
+                except sqlite3.IntegrityError:
+                    continue
     conn.commit()
     users = conn.execute(
         'SELECT * FROM users '
