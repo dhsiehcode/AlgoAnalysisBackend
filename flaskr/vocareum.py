@@ -387,7 +387,3 @@ def get_all_submissions_by_part(courseId, assignmentId, partId):
     #os.chdir(cur_dir)
 
     return save_path ## save path should now have all the files
-
-#get_all_submissions_by_part(courseId='101632', assignmentId='2336373', partId='2336418')
-
-#get_all_submissions_by_assignment(courseId='101632', assignmentId='2336373')

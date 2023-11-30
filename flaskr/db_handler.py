@@ -7,12 +7,28 @@ from flask import Flask
 
 '''
 
+author: Dennis Hsieh
+date: 11/30/2023
+
+a file with endpoints that interacts with the database
 
 '''
 
+
+## sets up a blueprint so it can be called
 bp = Blueprint('info', __name__, url_prefix='/info')
 
 
+
+'''
+
+a get request that should return all relevant information on
+1. courses
+2. students
+3. assignments
+4. parts
+
+'''
 @bp.route('/get', methods = ["GET"])
 def get_info():
     conn = db.get_db()
@@ -46,26 +62,11 @@ def get_info():
 
     return users_output + " \n " + assignment_output + " \n " + part_output
 
+'''
 
+get request that updates and populates database if necessary 
 
-
-
-@bp.route('/update', methods = ["GET"])
-def update_info():
-    auth_token = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
-
-    conn = db.get_db()
-
-    courses = vocareum.get_courses(auth_token) ## course a list of course objects
-
-    ## check if exist courses
-    for course in courses:
-        conn.execute("INSERT INTO courses (id, name) VALUES (?, ?)", (course.get_id(), course.get_name()))
-
-
-
-
-
+'''
 @bp.route('/populate', methods = ["GET"])
 def populate_info():
     auth_token = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
@@ -145,8 +146,3 @@ def populate_info():
 
     return "updated successfully"
 
-
-
-
-#with app.app_context():
-    #populate_info(auth_token)
