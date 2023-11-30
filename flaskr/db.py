@@ -62,11 +62,9 @@ def init_app(app):
     app.cli.add_command(init_db_command)
 
 '''
-forms connection with the database
+forms raw connection with the database
 '''
 def get_db_connection():
     db = get_db()
     conn = sqlite3.connect(db)
-    conn.row_factory = sqlite3.row
     return conn
-
