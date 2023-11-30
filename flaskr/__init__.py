@@ -40,6 +40,9 @@ def create_app(test_config=None):
     from . import db_handler
     app.register_blueprint(db_handler.bp)
 
+    from . import endpoints
+    app.register_blueprint(endpoints.bp)
+
     # a simple page that says hello
     @app.route('/welcome')
     def hello():
