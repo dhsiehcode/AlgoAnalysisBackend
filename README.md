@@ -27,3 +27,7 @@ Press CTRL+C to quit
 Go to `http://127.0.0.1:5000/[url]` to see any of the pages
 
 #### Mac
+
+
+### Setting up database (if it doesn't exist)
+A database should exist in `\instance` called `flaskr.sqlite`. If not, take the following steps. Run the server for developement. While the server is running, open another terminal (prompt) and run `flask --app flaskr init-db`. You should not see `Initialized the database.` and a file in `\instance` called `flaskr.sqlite`.
