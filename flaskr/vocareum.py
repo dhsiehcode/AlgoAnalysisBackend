@@ -6,7 +6,7 @@ import requests
 import json
 import zipfile
 
-import voc_objects
+from flaskr import voc_objects
 
 '''
 
@@ -276,7 +276,7 @@ def get_courses(auth_token):
 
             course = voc_objects.Course(course_dict['name'], course_dict['id'])
 
-            course.set_assignments(course.get_id())
+            course.set_assignments(get_assignments(auth_token, course.get_id()))
 
             courses.append(course)
 
@@ -312,7 +312,7 @@ def get_course(auth_token, courseId):
 
     course.set_assignments(get_assignments(auth_token, courseId))
 
-    return courseId
+    return course
 
 ## Using Dennis' auth token for now
 auth_toke = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
@@ -390,4 +390,4 @@ def get_all_submissions_by_part(courseId, assignmentId, partId):
 
 #get_all_submissions_by_part(courseId='101632', assignmentId='2336373', partId='2336418')
 
-get_all_submissions_by_assignment(courseId='101632', assignmentId='2336373')
+#get_all_submissions_by_assignment(courseId='101632', assignmentId='2336373')
