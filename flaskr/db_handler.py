@@ -12,6 +12,11 @@ date: 11/30/2023
 
 a file with endpoints that interacts with the database
 
+TODO:
+1. endpoint/method of some sort that stores runtime profiles into database
+2. extract runtime profile
+    2-1 based on desired selections
+
 '''
 
 
