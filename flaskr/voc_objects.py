@@ -89,7 +89,7 @@ assignments is a list that stores assignments of the course
 class Course:
 
     def __init__(self, name, id):
-        self.courseId = id
+        self.id = id
         self.name = name
         self.assignments = []
 
