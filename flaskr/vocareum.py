@@ -201,8 +201,10 @@ def get_latest_submission(auth_token, courseId, assignmentId, partId, userId, sa
     z = zipfile.ZipFile(f"{save_location}/{zipfile_name}.zip", "r")
     z.extractall(path=f"{save_location}")
 
+    sub = voc_objects.Submission(userId, f"{save_location}/{submission_info['dirname']}", submission_info['last_submission_at'])
 
-    return f"{save_location}", submission_info['dirname']
+
+    return sub
 
 
 

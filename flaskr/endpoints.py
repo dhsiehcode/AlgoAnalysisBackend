@@ -34,23 +34,85 @@ will download EVERY SINGLE SUBMISSION.
 This means latest submission for every part in every assignment in every course for every student
 
 '''
-@bp.route("/download_submissions", methods = ["GET"])
+@bp.route("/download_submission/all", methods = ["GET"])
 def download_submissions():
-    auth_token = ''
+    auth_token = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
 
     vocareum.init_check() ## makes sure directory exists
 
     conn = db.get_db()
     courses = conn.execute('SELECT * FROM courses').fetchall()  ## dict of {}
-    users = conn.execute("SELECT * FROM users").fetchall()  ## dict of {}
-    assignments = conn.execute("SELECT * FROM assignments").fetchall()  ## dict of {}
-    parts = conn.execute("SELECT * FROM parts").fetchall()  ## dict of {}
+
+
+    for course in courses:
+
+        download_submissions_course(courseId=course['id'])
+
+    return "success"
+
+@bp.route("/download_submission/part", methods = ["GET"])
+def download_submissions_part(courseId = '', assignmentId = '', partId = ''):
+
+    auth_token = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
+    courseId = '101632'
+    assignmentId = '2336373'
+    partId = '23336418'
+
+    vocareum.init_check()
+
+    conn = db.get_db()
+
+    users = conn.execute("SELECT * FROM users WHERE courseId = ?", (courseId, )).fetchall()
+    part = conn.execute("SELECT * FROM parts WHERE id = ? AND courseId = ? AND assignmentId = ? ", (partId, courseId, assignmentId, )).fetchall()
+
+    save_path = f"{os.getcwd()}/submissions/{courseId}/{assignmentId}/{part['id']}"
+    os.makedirs(save_path)
+
+    for user in users:
+        last_sub = vocareum.get_latest_submission(auth_token, courseId, assignmentId, partId, user['id'],
+                                                  save_path)
+
+    return "success"
+
+
+
+@bp.route("/download_submission/assignment", methods = ["GET"])
+def download_submissions_assignment(courseId = None, assignmentId = ''):
+
+    if courseId is None:
+        courseId = '101632'
+    assignmentId = '2336373'
+
+    auth_token = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
+
+    vocareum.init_check()
+
+    conn = db.get_db()
+
+    users = conn.execute("SELECT * FROM users WHERE courseId = ?", (courseId, )).fetchall()  ## dict of {}
+    assignment = conn.execute("SELECT * FROM assignments WHERE courseId = ?  AND id = ? ", (courseId, assignmentId, )).fetchone()  ## dict of {}
+
+    parts = conn.execute("SELECT * FROM parts WHERE courseId = ? AND assignmentId = ? ", (courseId, assignmentId, )).fetchall()
+
+    for part in parts:
+        save_path = f"{os.getcwd()}/submissions/{courseId}/{assignmentId}/{part['id']}"
+        os.makedirs(save_path)
+
+        for user in users:
+
+            last_sub = vocareum.get_latest_submission(auth_token, courseId, assignment['id'], part['id'], user['id'],
+                                                  save_path)
+
+    return "success"
 
 
 @bp.route("/download_submission/course", methods = ["GET"])
-def download_submissions_course(courseId = ''):
+def download_submissions_course(courseId = None):
 
-    courseId = '101632'
+
+    if courseId is None:
+        print(courseId)
+        courseId = '101632'
 
     auth_token = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
 
@@ -61,9 +123,10 @@ def download_submissions_course(courseId = ''):
     course = conn.execute('SELECT * FROM courses WHERE id = ?', (courseId, )).fetchone()  ## dict of {}
     users = conn.execute("SELECT * FROM users WHERE courseId = ?", (courseId, )).fetchall()  ## dict of {}
     assignments = conn.execute("SELECT * FROM assignments WHERE courseId = ?", (courseId, )).fetchall()  ## dict of {}
-    parts = conn.execute("SELECT * FROM parts WHERE courseId = ?", (courseId, )).fetchall()  ## dict of {}
 
     for assignment in assignments:
+
+        parts = conn.execute("SELECT * FROM parts WHERE courseId = ? AND assignmentId = ?", (courseId, assignment['id'],)).fetchall()  ## dict of {}
 
         for part in parts:
             save_path = f"{os.getcwd()}/submissions/{courseId}/{assignment['id']}/{part['id']}"
@@ -75,11 +138,15 @@ def download_submissions_course(courseId = ''):
 
         for assignment in assignments:
 
+            parts = conn.execute("SELECT * FROM parts WHERE courseId = ? AND assignmentId = ?",
+                                 (courseId,assignment['id'],)).fetchall()  ## dict of {}
             for part in parts:
 
                 save_path = f"{os.getcwd()}/submissions/{courseId}/{assignment['id']}/{part['id']}"
 
-                saved_name = vocareum.get_latest_submission(auth_token, course['id'], assignment['id'], part['id'], user['id'], save_path)
+                last_sub = vocareum.get_latest_submission(auth_token, course['id'], assignment['id'], part['id'], user['id'], save_path)
+
+
 
 
     return "success"
@@ -90,19 +157,36 @@ def download_submissions_course(courseId = ''):
 @bp.route("/download_submission/student", methods = ["GET"])
 def download_submissions_student(userId = ''):
 
-    auth_token = ''
+    auth_token = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
 
     vocareum.init_check()
 
     conn = db.get_db()
 
-    courses = conn.execute('SELECT * FROM courses').fetchall()  ## dict of {}
     users = conn.execute("SELECT * FROM users").fetchall()  ## dict of {}
-    assignments = conn.execute("SELECT * FROM assignments").fetchall()  ## dict of {}
-    parts = conn.execute("SELECT * FROM parts").fetchall()  ## dict of {}
 
     if not userId in users['id']:
         return ## student doesn't exist
+
+    courses = conn.execute('SELECT * FROM users WHERE id = ?', (userId,)).fetchall()  ## dict of {}
+
+    for course in courses:
+
+        assignments = conn.execute("SELECT * FROM assignments WHERE courseId = ?", (course['id'])).fetchall()  ## dict of {}
+
+        for assignment in assignments:
+
+            parts = conn.execute("SELECT * FROM parts WHERE courseId = ? AND assignmentId = ?", (course['id'], assignment['id']))
+
+            for part in parts:
+                save_path = f"{os.getcwd()}/submissions/{course['id']}/{assignment['id']}/{part['id']}"
+                os.makedirs(save_path)
+
+                last_sub = vocareum.get_latest_submission(auth_token, course['id'], assignment['id'], part['id'], userId, save_path)
+
+
+    return "success"
+
 
 
 
