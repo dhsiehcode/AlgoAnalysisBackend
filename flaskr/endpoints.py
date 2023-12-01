@@ -1,3 +1,4 @@
+import os
 import sqlite3
 from flask import current_app, g, Blueprint, request
 import requests
@@ -26,3 +27,82 @@ TODO:
 
 ## sets up a blueprint so it can be called
 bp = Blueprint('services', __name__, url_prefix='/services')
+
+'''
+
+will download EVERY SINGLE SUBMISSION. 
+This means latest submission for every part in every assignment in every course for every student
+
+'''
+@bp.route("/download_submissions", methods = ["GET"])
+def download_submissions():
+    auth_token = ''
+
+    vocareum.init_check() ## makes sure directory exists
+
+    conn = db.get_db()
+    courses = conn.execute('SELECT * FROM courses').fetchall()  ## dict of {}
+    users = conn.execute("SELECT * FROM users").fetchall()  ## dict of {}
+    assignments = conn.execute("SELECT * FROM assignments").fetchall()  ## dict of {}
+    parts = conn.execute("SELECT * FROM parts").fetchall()  ## dict of {}
+
+
+@bp.route("/download_submission/course", methods = ["GET"])
+def download_submissions_course(courseId = ''):
+
+    courseId = '101632'
+
+    auth_token = 'b7ced88c162ce28340e00851f5a216f4259e69c6'
+
+    vocareum.init_check()
+
+    conn = db.get_db()
+
+    course = conn.execute('SELECT * FROM courses WHERE id = ?', (courseId, )).fetchone()  ## dict of {}
+    users = conn.execute("SELECT * FROM users WHERE courseId = ?", (courseId, )).fetchall()  ## dict of {}
+    assignments = conn.execute("SELECT * FROM assignments WHERE courseId = ?", (courseId, )).fetchall()  ## dict of {}
+    parts = conn.execute("SELECT * FROM parts WHERE courseId = ?", (courseId, )).fetchall()  ## dict of {}
+
+    for assignment in assignments:
+
+        for part in parts:
+            save_path = f"{os.getcwd()}/submissions/{courseId}/{assignment['id']}/{part['id']}"
+            os.makedirs(save_path)
+
+
+
+    for user in users:
+
+        for assignment in assignments:
+
+            for part in parts:
+
+                save_path = f"{os.getcwd()}/submissions/{courseId}/{assignment['id']}/{part['id']}"
+
+                saved_name = vocareum.get_latest_submission(auth_token, course['id'], assignment['id'], part['id'], user['id'], save_path)
+
+
+    return "success"
+
+
+
+
+@bp.route("/download_submission/student", methods = ["GET"])
+def download_submissions_student(userId = ''):
+
+    auth_token = ''
+
+    vocareum.init_check()
+
+    conn = db.get_db()
+
+    courses = conn.execute('SELECT * FROM courses').fetchall()  ## dict of {}
+    users = conn.execute("SELECT * FROM users").fetchall()  ## dict of {}
+    assignments = conn.execute("SELECT * FROM assignments").fetchall()  ## dict of {}
+    parts = conn.execute("SELECT * FROM parts").fetchall()  ## dict of {}
+
+    if not userId in users['id']:
+        return ## student doesn't exist
+
+
+

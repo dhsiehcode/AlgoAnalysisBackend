@@ -338,8 +338,6 @@ def get_all_submissions_by_assignment(courseId,assignmentId):
 
     ## before db is up we get all students
 
-    students = get_students(auth_token=auth_toke, courseId=courseId)
-
     os.chdir("..")
 
     for partId, part in get_parts(auth_token=auth_toke, courseId=courseId, assignmentId=assignmentId).items():
