@@ -108,5 +108,29 @@ class Course:
     def set_assignments(self, assignments):
         self.assignments = assignments
 
+'''
+
+wrapper object that represents a submission dwonload on vocareum
+
+'''
+class Submission:
+
+    def __init__(self, user, dir_name, time_stamp, submission_count = 1):
+        self.userId = user
+        self.dir_name = dir_name
+        self.last_sub = time_stamp
+        self.sub_count = submission_count
+
+    def get_user(self):
+        return self.userId
+
+    def get_stored_dir(self):
+        return self.dir_name
+
+    def get_sub_time(self):
+        return self.last_sub
+
+    def get_sub_count(self):
+        return self.sub_count
 
 
