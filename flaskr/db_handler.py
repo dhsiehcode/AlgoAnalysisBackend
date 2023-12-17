@@ -19,9 +19,24 @@ TODO:
 
 '''
 
+def update_db():
+
+    ## add users
+
+    ## update projects
+
+    ## create project tables if necessary
+
+    ## udpate test files
+
+def create_project_table(name):
+    conn = db.get_db()
+    conn.execute('CREATE TABLE (?)', (name))
+    db.close_db()
+
 
 ## sets up a blueprint so it can be called
-bp = Blueprint('info', __name__, url_prefix='/info')
+##bp = Blueprint('info', __name__, url_prefix='/info')
 
 
 
@@ -34,6 +49,7 @@ a get request that should return all relevant information on
 4. parts
 
 '''
+'''
 @bp.route('/get', methods = ["GET"])
 def get_info():
     conn = db.get_db()
@@ -42,11 +58,10 @@ def get_info():
     assignments = conn.execute("SELECT * FROM assignments").fetchall() ## dict of {}
     parts = conn.execute("SELECT * FROM parts").fetchall() ## dict of {}
 
-    '''
+
     
-    testing to prove this functionality works
+    #testing to prove this functionality works
     
-    '''
 
     users_output = "users: \n"
 
@@ -66,11 +81,14 @@ def get_info():
     db.close_db()
 
     return users_output + " \n " + assignment_output + " \n " + part_output
+'''
+
 
 '''
 
 get request that updates and populates database if necessary 
 
+'''
 '''
 @bp.route('/populate', methods = ["GET"])
 def populate_info():
@@ -137,9 +155,7 @@ def populate_info():
 
     db.close_db()
 
-    ''' 
-    the following lines test the functionality
-    '''
+    #the following lines test the functionality
 
     print("getting users as proof of function")
 
@@ -151,3 +167,4 @@ def populate_info():
 
     return "updated successfully"
 
+'''

@@ -1,39 +1,17 @@
-
-DROP TABLE IF EXISTS courses;
-
-CREATE TABLE courses (
-    id INTEGER UNIQUE PRIMARY KEY,
-    name TEXT NOT NULL
+CREATE TABLE accounts (
+    name TEXT PRIMARY KEY,
+    hashed_password TEXT,
+    classes TEXT,
 );
 
-
-DROP TABLE IF EXISTS users;
-
-
-CREATE TABLE users (
-    id INTEGER UNIQUE PRIMARY KEY,
-    name TEXT NOT NULL,
-    courseId INTEGER NOT NULL,
-    FOREIGN KEY (courseId) REFERENCES courses(id)
+CREATE TABLE projects (
+    class TEXT PRIMARY KEY,
+    class_id TEXT UNIQUE,
+    name TEXT,
+    vocareum_id TEXT,
 );
 
-DROP TABLE IF EXISTS assignments;
-
-CREATE TABLE assignments (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    courseId INTEGER NOT NULL,
-    FOREIGN KEY (courseId) REFERENCES courses(id)
-);
-
-DROP TABLE IF EXISTS parts;
-
-CREATE TABLE parts (
-
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    assignmentId INTEGER NOT NULL,
-    courseId INTEGER NOT NULL,
-    FOREIGN KEY (assignmentId) REFERENCES assignments(id)
-    FOREIGN KEY (courseId) REFERENCES courses(id)
-);
+CREATE TABLE tests (
+    project TEXT PRIMARY KEY,
+    test_file TEXT,
+)
